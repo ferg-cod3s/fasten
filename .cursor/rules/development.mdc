@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Rules for Fasten
+
+## Environment
+- Use Zig 0.11.0+; set up with Homebrew, direct download, or package manager.
+- Recommended: VS Code with ziglang extension, or Vim/Neovim with zig.vim.
+
+## Build
+- Use `zig build` for standard, debug, release, and safe builds.
+- Use build options for features and target platforms.
+- Clean with `zig build clean`.
+
+## Testing
+- Run all tests with `zig build test`.
+- Organize tests: unit, integration, performance, regression.
+- Use memory leak detection and verbose output as needed.
+
+## Debugging
+- Use debug builds and Zig's logging.
+- Use Valgrind, AddressSanitizer, or platform profilers for memory/perf issues.
+
+## CI/CD
+- Use GitHub Actions for build, test, benchmark, security, docs.
+- Simulate CI locally with provided scripts.
+
+## Workflow
+- Feature: branch, test, implement, benchmark, document, PR.
+- Bugfix: reproduce, fix, verify, regression test, PR.
+- Review: self-review, CI, peer review, address feedback, merge.

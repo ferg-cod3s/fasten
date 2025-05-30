@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Code Style Rules for Fasten
+
+## Zig Code Style
+- Organize files: std imports, local imports, constants, types, public/private functions, tests.
+- Naming: camelCase for functions, snake_case for variables/fields, PascalCase for types/enums, SCREAMING_SNAKE_CASE for constants.
+- Indent with 4 spaces, no tabs. Max line length: 100 chars.
+- One space around binary ops, after commas/semicolons; no trailing whitespace.
+- Braces on same line; always use braces for control structures.
+
+## Documentation
+- Document all public functions with triple-slash comments (///), including params, returns, errors.
+- Use inline comments for complex/non-obvious code.
+
+## Error Handling
+- Use specific error enums per module; descriptive error names.
+- Use `try` for propagation; `catch` only for meaningful handling.
+- Include file, line, column in error messages.
+
+## Memory Management
+- Pass allocators explicitly; use ArenaAllocator for temp data.
+- Use `defer` for cleanup; always free resources.
+
+## Testing
+- Group related tests; descriptive names; test both success and error cases.
+- Use realistic and edge-case data.
+
+## Performance
+- Minimize allocations in hot paths; reuse buffers; avoid unnecessary copying.
+- Tokenization: <1ms/KB; Parsing: <5ms/KB; Memory: <2x input size.

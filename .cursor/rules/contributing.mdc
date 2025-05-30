@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Contributing Rules for Fasten
+
+## Code of Conduct
+- Be respectful, constructive, and professional in all interactions.
+
+## Code Standards
+- Use Zig naming conventions: camelCase for functions, snake_case for variables, PascalCase for types.
+- Keep functions under 50 lines; cyclomatic complexity ≤ 10.
+- Document all public functions and complex algorithms.
+- Use explicit allocators and ensure all resources are freed.
+- Use Zig's error handling consistently.
+
+## Testing
+- Write unit, integration, performance, and error tests.
+- Use descriptive test names: `test "should [behavior] when [condition]"`.
+- Benchmark critical paths and set performance targets.
+
+## Performance
+- Bundle 100-200 JS files (~100KB) in <1s; 500+ files (~500KB) in <5s.
+- Peak memory ≤ 2x input size; zero tolerance for memory leaks.
+
+## Submission Process
+- Run all tests and benchmarks before submitting.
+- Use conventional commit messages: `type(scope): description`.
+- Complete PR checklist and template.
+- PRs require at least one maintainer review and passing CI.
+
+## Architecture
+- Each module has a single responsibility.
+- Explicit, minimal dependencies.
+- Consistent error propagation and documentation.
+- Optimize for speed, memory, and testability.

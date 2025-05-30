@@ -1,0 +1,29 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Performance Rules for Fasten
+
+## Targets
+- Small: <100ms, <10MB; Medium: <500ms, <50MB; Large: <2s, <200MB; XL: <10s, <500MB.
+- Lexer: >1MB/s; Parser: >500KB/s; Optimizer: >2MB/s; Codegen: >5MB/s.
+- Cold start <50ms; base memory <5MB.
+
+## Benchmarking
+- Use provided benchmark framework; warmup, multiple iterations, throughput checks.
+- Assert performance targets in tests; fail on regression >10%.
+
+## Memory
+- Use ArenaAllocator for temp data; Pool for frequent allocations.
+- Profile memory; zero tolerance for leaks; peak usage <2x input size.
+
+## Optimization
+- Minimize allocations in hot paths; use stack allocation when possible.
+- Profile before optimizing; document all optimizations.
+- Use efficient data structures (interning, compact AST).
+
+## Monitoring
+- Collect and log metrics (time, memory, compression ratio).
+- Alert on slow bundling, high memory, poor compression.
+- Run performance and memory tests in CI.

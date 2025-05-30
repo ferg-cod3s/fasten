@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Security Rules for Fasten
+
+## Input Validation
+- Validate all file paths to prevent traversal.
+- Limit input file size and check permissions.
+- Validate and sanitize all input before processing.
+
+## Build & Runtime Security
+- Use only Zig stdlib; audit any external dependencies.
+- Reproducible, signed builds; secure distribution.
+- Strict memory management; bounds checking; safe allocations.
+- No sensitive info in error messages or logs.
+
+## Reporting Vulnerabilities
+- Do NOT report via public issues. Email security@fasten-bundler.dev with details.
+- Acknowledge within 48h, resolve critical issues within 30 days.
+
+## User Best Practices
+- Only process trusted files; verify file integrity.
+- Run in sandbox for untrusted input.
+- Keep system/tools updated; secure storage and access.
+
+## Hardening
+- Build with `zig build -Doptimize=ReleaseSafe`.
+- Use resource limits (ulimit) and minimal permissions for runtime.
