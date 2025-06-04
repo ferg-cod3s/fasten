@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 📝 TASKS.md Update Rule (Severity: Warning)
+
+- ALWAYS update TASKS.md when completing any task or subtask
+- Mark items as ✅ Completed immediately after verification
+- Add verification notes for important milestones
+- Include test results and command examples for CLI/build features
+- Update the "Current Status" section to reflect the next target
+- Use specific markers: [✅] for complete, [🔄] for in progress, [🧪] for testing required
+- Include any bonus features or work that exceeded requirements
+- Update milestone progress when reaching key checkpoints
+
+## Process:
+- Complete a task/subtask
+- Test/verify it works
+- Immediately update TASKS.md with ✅ status
+- Add verification notes and test results
+- Update "Current Status" section
+- Commit the TASKS.md update along with the code changes

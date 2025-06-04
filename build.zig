@@ -16,9 +16,9 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // This enables benchmarks
-    const enable_benchmarks = b.options(bool, "benchmarks", "Enable benchmark builds") orelse false;
+    const enable_benchmarks = b.option(bool, "benchmarks", "Enable benchmark builds") orelse false;
     // This enables profiling
-    const enable_profiling = b.options(bool, "profiling", "Enable profiling support") orelse false;
+    const enable_profiling = b.option(bool, "profiling", "Enable profiling support") orelse false;
     // This enables verbose logging
     const enable_verbose = b.option(bool, "verbose", "Enable verbose logging") orelse false;
 
@@ -59,7 +59,7 @@ pub fn build(b: *std.Build) void {
     exe_mod.addImport("fasten_lib", lib_mod);
 
     // Add the build imports to the executable module
-    exe_mod.addImport("build_import", build_options.createModule());
+    exe_mod.addImport("build_options", build_options.createModule());
 
     // Now, we will create a static library based on the module we created above.
     // This creates a `std.Build.Step.Compile`, which is the build step responsible
@@ -92,6 +92,13 @@ pub fn build(b: *std.Build) void {
     // such a dependency.
     const run_cmd = b.addRunArtifact(exe);
 
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step = b.step("run", "Run the Fasten executable");
+    run_step.dependOn(&run_cmd.step);
+
     // By making the run step depend on the install step, it will be run from the
     // installation directory rather than directly from within the cache directory.
     // This is not necessary, however, if the application depends on other installed
@@ -99,7 +106,7 @@ pub fn build(b: *std.Build) void {
     run_cmd.step.dependOn(b.getInstallStep());
 
     // Test steps
-    const lib_unit_tests = b.addTests(.{
+    const lib_unit_tests = b.addTest(.{
         .root_module = lib_mod,
     });
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
@@ -130,36 +137,50 @@ pub fn build(b: *std.Build) void {
         bench_step.dependOn(&run_bench.step);
     }
 
-    // This allows the user to pass arguments to the application in the build
-    // command itself, like this: `zig build run -- arg1 arg2 etc`
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build run`
-    // This will evaluate the `run` step rather than the default, which is "install".
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
-
-    // Creates a step for unit testing. This only builds the test executable
-    // but does not run it.
-    const lib_unit_tests = b.addTest(.{
+    // Documentation step
+    const docs = b.addTest(.{
         .root_module = lib_mod,
     });
+    docs.root_module.strip = false;
+    const docs_step = b.step("docs", "Generate documentation");
+    docs_step.dependOn(&b.addInstallDirectory(.{
+        .source_dir = docs.getEmittedDocs(),
+        .install_dir = .prefix,
+        .install_subdir = "docs",
+    }).step);
 
-    const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
+    // Clean step (remove all build artifacts) - not needed for now
+    // const clean_step = b.step("clean", "Remove build artifacts");
+    // Note: Zig automatically cleans zig-cache and zig-out, but we can add custom cleanup here if needed
 
-    const exe_unit_tests = b.addTest(.{
-        .root_module = exe_mod,
+    // Release builds with different optimization levels
+    const release_safe_mod = b.createModule(.{
+        .root_source_file = b.path("src/main.zig"),
+        .target = target,
+        .optimize = .ReleaseSafe,
     });
+    release_safe_mod.addImport("fasten_lib", lib_mod);
+    release_safe_mod.addImport("build_options", build_options.createModule());
 
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
+    const release_safe_exe = b.addExecutable(.{
+        .name = "fasten-safe",
+        .root_module = release_safe_mod,
+    });
+    const release_safe_step = b.step("release-safe", "Build optimized version with safety checks");
+    release_safe_step.dependOn(&b.addInstallArtifact(release_safe_exe, .{}).step);
 
-    // Similar to creating the run step earlier, this exposes a `test` step to
-    // the `zig build --help` menu, providing a way for the user to request
-    // running the unit tests.
-    const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&run_lib_unit_tests.step);
-    test_step.dependOn(&run_exe_unit_tests.step);
+    const release_fast_mod = b.createModule(.{
+        .root_source_file = b.path("src/main.zig"),
+        .target = target,
+        .optimize = .ReleaseFast,
+    });
+    release_fast_mod.addImport("fasten_lib", lib_mod);
+    release_fast_mod.addImport("build_options", build_options.createModule());
+
+    const release_fast_exe = b.addExecutable(.{
+        .name = "fasten-fast",
+        .root_module = release_fast_mod,
+    });
+    const release_fast_step = b.step("release-fast", "Build fastest optimized version");
+    release_fast_step.dependOn(&b.addInstallArtifact(release_fast_exe, .{}).step);
 }
