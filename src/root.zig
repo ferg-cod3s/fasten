@@ -4,7 +4,11 @@
 const std = @import("std");
 const testing = std.testing;
 
-pub const lexer = @import("lexer/token.zig");
+// Export lexer module properly
+pub const lexer = struct {
+    pub usingnamespace @import("lexer/token.zig");
+    pub const Tokenizer = @import("lexer/tokenizer.zig").Tokenizer;
+};
 
 pub export fn add(a: i32, b: i32) i32 {
     return a + b;

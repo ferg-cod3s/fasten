@@ -215,15 +215,45 @@ pub fn main() !void {
         }
     }
 
-    // TODO: Call fasten_lib functions for actual bundling
-    // const bundle_result = try fasten_lib.bundle(allocator, file_content, .{ .minify = args.minify });
+    if (verbose) {
+        print("Read {d} bytes from input file\n", .{file_content.len});
+    }
+
+    // ✨ NEW: Tokenize the JavaScript file
+    var file_tokenizer = fasten_lib.lexer.Tokenizer.init(file_content, allocator);
+    const tokens = file_tokenizer.tokenize() catch |err| switch (err) {
+        error.OutOfMemory => {
+            print("Error: Out of memory during tokenization\n", .{});
+            return;
+        },
+        else => return err,
+    };
+    defer tokens.deinit();
+
+    if (verbose) {
+        print("Tokenized into {d} tokens\n", .{tokens.items.len});
+        print("\n--- TOKENS ---\n", .{});
+        fasten_lib.lexer.TokenUtils.printTokens(tokens.items);
+        print("--- END TOKENS ---\n\n", .{});
+    }
+
+    // Basic validation - now using tokenizer
+    var has_import = false;
+    var has_export = false;
+    for (tokens.items) |token| {
+        if (token.type == .IMPORT) has_import = true;
+        if (token.type == .EXPORT) has_export = true;
+    }
+
+    if (has_import or has_export) {
+        print("✓ Detected ES module syntax (import/export)\n", .{});
+    } else {
+        if (verbose) {
+            print("✗ No ES module syntax detected\n", .{});
+        }
+    }
 
     print("Bundle would be written to: {s}\n", .{output_file});
-
-    // TODO: Implement actual bundling logic
-    if (verbose) {
-        print("Bundling complete\n", .{});
-    }
 }
 
 test "simple test" {
